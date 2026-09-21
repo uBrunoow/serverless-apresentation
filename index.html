@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Serverless — Arquiteturas de Software</title>
+<meta name="description" content="Apresentação sobre arquitetura serverless: definição, componentes, fluxo, trade-offs, cenários, ecossistema e exemplo prático.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* ---------- tokens ---------- */
+:root{
+  --bg:#0B0E14;
+  --bg-2:#10141C;
+  --surface:#151A23;
+  --line:rgba(232,236,244,.10);
+  --line-2:rgba(232,236,244,.18);
+  --text:#EEF1F6;
+  --muted:#9AA4B8;
+  --dim:#5E6879;
+  --coral:#FD5750;
+  --coral-2:#FF7A73;
+  --coral-ink:#1A0806;
+  --green:#3DD68C;
+  --font:"Chakra Petch",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --W:1920px; --H:1080px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--coral);color:var(--coral-ink)}
+:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img{display:block;max-width:100%}
+svg{display:block}
+
+/* ---------- stage ---------- */
+.stage{position:absolute;top:0;left:0;width:var(--W);height:var(--H);transform-origin:top left;background:var(--bg);overflow:hidden}
+.stage::before{ /* grade técnica */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:96px 96px;background-position:72px 0;opacity:.45;
+  mask-image:radial-gradient(120% 90% at 70% 40%,#000 30%,transparent 100%);
+}
+.slide{position:absolute;inset:0;padding:112px 120px 120px 184px;opacity:0;visibility:hidden;transition:opacity .45s var(--ease),visibility 0s .45s;display:flex;flex-direction:column}
+.slide.cur{opacity:1;visibility:visible;transition:opacity .5s var(--ease)}
+.slide.cur > .in{animation:rise .6s var(--ease) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* trilho lateral */
+.rail{position:absolute;left:0;top:0;bottom:0;width:72px;border-right:1px solid var(--line);z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:32px 0;background:var(--bg)}
+.rail .mark{width:22px;height:22px;background:var(--coral);clip-path:polygon(0 0,100% 0,100% 100%,0 100%,0 62%,38% 62%,38% 38%,0 38%)}
+.rail .sec{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--mono);font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.rail .num{font-family:var(--mono);font-size:13px;color:var(--muted);letter-spacing:.08em;text-align:center;line-height:1.5}
+.rail .num b{color:var(--text);font-weight:600}
+.progress{position:absolute;left:72px;right:0;bottom:0;height:3px;background:var(--line);z-index:5}
+.progress i{display:block;height:100%;background:var(--coral);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
+
+/* ---------- tipografia ---------- */
+.kicker{font-family:var(--mono);font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:22px}
+h1,h2{font-weight:700;text-transform:uppercase;line-height:.92;letter-spacing:-.015em;text-wrap:balance}
+h2{font-size:76px;max-width:1200px}
+.lede{font-size:28px;font-weight:300;color:var(--muted);max-width:820px;line-height:1.35;margin-top:22px;text-wrap:pretty}
+.lede strong{color:var(--text);font-weight:500}
+.head{margin-bottom:56px}
+.body{flex:1;min-height:0;display:flex}
+.foot{margin-top:auto;padding-top:32px;border-top:1px solid var(--line);font-size:24px;font-weight:300;color:var(--muted);max-width:1300px;line-height:1.4}
+.foot strong{color:var(--text);font-weight:500}
+
+/* ---------- fragmentos (revelados por clique) ---------- */
+.f{opacity:0;transform:translateY(10px);transition:opacity .4s var(--ease),transform .5s var(--ease),border-color .4s,background-color .4s,color .4s}
+.f.on{opacity:1;transform:none}
+.f.was{opacity:.62}  /* fragmento já apresentado, foco passou adiante */
+.node.f.was,.grid1k.f{opacity:1}
+
+/* ---------- placeholders de imagem ---------- */
+.ph{position:relative;border:1px dashed var(--line-2);background:var(--bg-2);overflow:hidden;display:grid;place-items:center}
+.ph::before{content:attr(data-label);position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);text-align:center;padding:20px;line-height:1.7;white-space:pre-line}
+.ph::after{content:"";position:absolute;inset:14px;border:1px solid var(--line);pointer-events:none}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph:has(img)::before,.ph:has(img)::after{display:none}
+.ph:has(img){border-style:solid}
+
+/* ---------- capa ---------- */
+.cover{padding-right:0}
+.cover .in{display:grid;grid-template-columns:860px 1fr;gap:0;height:100%}
+.cover .meta{font-family:var(--mono);font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;gap:32px;align-items:center}
+.cover .meta i{width:24px;height:1px;background:var(--line-2)}
+.cover h1{font-size:196px;margin-top:64px;letter-spacing:-.03em;position:relative}
+.cover h1 span{display:block;font-size:44px;font-weight:400;letter-spacing:.02em;color:var(--muted);text-transform:none;margin-top:18px;line-height:1.15;max-width:640px}
+.cover .people{margin-top:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:40px;max-width:760px;padding-top:32px;border-top:1px solid var(--line)}
+.cover .people dt{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.cover .people dd{font-size:20px;color:var(--text);font-weight:400;line-height:1.35}
+.cover .people dd.todo{color:var(--muted);font-weight:300}
+.cover .visual{position:relative;height:100%}
+.cover .visual .ph{position:absolute;top:-112px;right:0;bottom:-120px;left:40px;border-left:1px solid var(--line);border-top:0;border-right:0;border-bottom:0;background:linear-gradient(180deg,var(--bg-2),var(--bg))}
+.cover .visual .ph::after{inset:0;border:0}
+.cover .visual .ph::before{align-content:start;padding-top:180px}
+
+/* terminal */
+.term{position:absolute;left:-120px;bottom:40px;width:640px;background:#07090D;border:1px solid var(--line-2);box-shadow:0 30px 60px -20px rgba(0,0,0,.7),0 0 0 1px rgba(0,0,0,.6);font-family:var(--mono);font-size:17px;line-height:1.75;z-index:2}
+.term .bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.term .bar i{width:10px;height:10px;border:1px solid var(--line-2)}
+.term .bar i:first-child{background:var(--coral);border-color:var(--coral)}
+.term .bar span{margin-left:auto}
+.term pre{padding:22px 24px 26px;font:inherit;color:var(--muted);white-space:pre-wrap;min-height:230px}
+.term .p{color:var(--coral)}
+.term .c{color:var(--text)}
+.term .ok{color:var(--green)}
+.term .k{color:var(--dim)}
+.term .cur{display:inline-block;width:9px;height:19px;background:var(--coral);vertical-align:-3px;margin-left:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.term .line{opacity:0}
+.term .line.show{opacity:1}
+
+/* ---------- divisor de capítulo ---------- */
+.divider{padding:0;background:var(--coral);color:var(--coral-ink)}
+.divider.cur{animation:wipe .7s var(--ease) both}
+@keyframes wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.divider .in{position:absolute;inset:0;padding:112px 120px 120px 184px;display:flex;flex-direction:column;justify-content:space-between}
+.divider .n{font-size:560px;font-weight:700;line-height:.8;letter-spacing:-.06em;margin-left:-14px;color:var(--coral-ink);opacity:.92}
+.divider .cap{display:flex;align-items:flex-end;justify-content:space-between;gap:40px}
+.divider h2{font-size:120px;color:var(--coral-ink);max-width:1000px}
+.divider p{font-family:var(--mono);font-size:16px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral-ink);opacity:.72;max-width:460px;line-height:1.7;padding-bottom:16px}
+.divider ~ .rail-dark{display:none}
+
+/* ---------- definição: lista + imagem ---------- */
+.two{display:grid;grid-template-columns:1fr 600px;gap:96px;width:100%}
+.pts{list-style:none;display:grid;gap:0}
+.pts li{display:grid;grid-template-columns:1fr;gap:6px;padding:26px 0;border-top:1px solid var(--line)}
+.pts li:last-child{border-bottom:1px solid var(--line)}
+.pts h3{font-size:30px;font-weight:600;text-transform:uppercase;letter-spacing:-.005em}
+.pts p{font-size:22px;font-weight:300;color:var(--muted);line-height:1.4;max-width:640px}
+.pts li.on h3{color:var(--text)}
+.two .ph{align-self:stretch}
+
+/* ---------- componentes: tabela ---------- */
+.tbl{width:100%;border-collapse:collapse;font-size:22px}
+.tbl th{font-family:var(--mono);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-align:left;padding:0 0 14px;border-bottom:1px solid var(--line-2);font-weight:400}
+.tbl td{padding:22px 40px 22px 0;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.4}
+.tbl td:first-child{font-weight:600;text-transform:uppercase;font-size:24px;width:300px;white-space:nowrap}
+.tbl td:last-child{color:var(--muted);font-weight:300;padding-right:0}
+.tbl tr.on td:first-child{color:var(--coral)}
+.tbl tr.on.was td:first-child{color:var(--text)}
+.tbl tr.f{transform:none}
+
+/* ---------- pipeline (fluxo) ---------- */
+.pipe{position:relative;width:100%;display:grid;grid-template-columns:repeat(5,1fr);gap:28px;padding-top:44px}
+.pipe .track{position:absolute;left:0;right:0;top:0;height:2px;background:var(--line)}
+.pipe .track i{position:absolute;left:0;top:0;height:100%;width:100%;background:var(--coral);transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease)}
+.pipe .pk{position:absolute;top:-7px;left:0;width:16px;height:16px;background:var(--coral);transform:translateX(-50%);opacity:0;transition:left .6s var(--ease),opacity .3s;box-shadow:0 0 0 6px rgba(253,87,80,.18)}
+.pipe .pk.show{opacity:1}
+.node{border:1px solid var(--line);background:var(--bg-2);padding:26px 28px 30px;min-height:270px;display:flex;flex-direction:column;position:relative}
+.node::before{content:"";position:absolute;left:50%;top:-44px;width:1px;height:44px;background:var(--line)}
+.node .i{font-family:var(--mono);font-size:13px;letter-spacing:.14em;color:var(--dim)}
+.node h3{font-size:26px;font-weight:600;text-transform:uppercase;line-height:1.05;margin-top:64px}
+.node p{font-size:19px;font-weight:300;color:var(--muted);margin-top:10px;line-height:1.35}
+.node.on{border-color:var(--coral);background:var(--surface)}
+.node.on .i{color:var(--coral)}
+.node.on::before{background:var(--coral)}
+.node.on.was{border-color:var(--line-2)}
+.node.on.was .i{color:var(--muted)}
+.node.on.was::before{background:var(--line-2)}
+.node .ic{width:34px;height:34px;color:var(--muted);position:absolute;top:26px;right:26px}
+.node.on .ic{color:var(--coral)}
+.node.on.was .ic{color:var(--muted)}
+.node.f{transform:translateY(16px)}
+.node.f.on{transform:none}
+
+/* ---------- escala: 1 → 1000 ---------- */
+.scale{display:grid;grid-template-columns:600px 1fr;gap:96px;width:100%;align-items:center}
+.scale .big{font-size:220px;font-weight:700;line-height:.85;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.scale .big small{display:block;font-size:26px;font-weight:300;color:var(--muted);letter-spacing:0;margin-top:20px;text-transform:none}
+.grid1k{display:grid;grid-template-columns:repeat(40,1fr);gap:4px;aspect-ratio:40/25;width:100%;align-self:stretch}
+.grid1k.f{transform:none}
+.grid1k i{display:block;background:var(--line);transition:background .3s;transition-delay:calc(var(--d) * 1ms)}
+.grid1k i:first-child{background:var(--coral)}
+.grid1k.on i{background:var(--coral)}
+.scale .note{margin-top:28px;font-size:22px;font-weight:300;color:var(--muted);max-width:520px;line-height:1.45}
+
+/* ---------- problema → solução ---------- */
+.pairs{width:100%;display:grid;gap:0}
+.pair{display:grid;grid-template-columns:1fr 72px 1fr;align-items:center;gap:32px;padding:26px 0;border-top:1px solid var(--line);font-size:28px}
+.pair:last-child{border-bottom:1px solid var(--line)}
+.pair .a{color:var(--muted);font-weight:300;text-decoration:line-through;text-decoration-color:transparent;transition:text-decoration-color .5s .25s}
+.pair .b{color:var(--coral);font-weight:600;text-transform:uppercase;font-size:26px}
+.pair .arr{color:var(--dim);width:72px;height:24px}
+.pair.on .a{text-decoration-color:var(--dim)}
+.pair.on .arr{color:var(--coral)}
+.pair.on.was .b{color:var(--text)}
+.pair.on.was .arr{color:var(--muted)}
+
+/* ---------- colunas ---------- */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:96px;width:100%}
+.col h3{font-family:var(--mono);font-size:14px;letter-spacing:.16em;text-transform:uppercase;padding-bottom:16px;border-bottom:1px solid var(--line-2);color:var(--muted);display:flex;align-items:center;gap:12px}
+.col h3::before{content:"";width:10px;height:10px;background:currentColor}
+.col.pro h3{color:var(--green)}
+.col.con h3{color:var(--coral)}
+.col ul{list-style:none}
+.col li{display:grid;grid-template-columns:32px 1fr;gap:18px;align-items:start;padding:26px 0;border-bottom:1px solid var(--line);font-size:28px;line-height:1.3}
+.col li svg{width:26px;height:26px;margin-top:4px;color:var(--dim)}
+.col.pro li.on svg{color:var(--green)}
+.col.con li.on svg{color:var(--coral)}
+.col li small{display:block;font-size:19px;font-weight:300;color:var(--muted);margin-top:6px}
+
+/* cold start: barras */
+.cold{margin-top:16px;display:grid;gap:10px;font-family:var(--mono);font-size:13px;letter-spacing:.06em;color:var(--muted)}
+.cold div{display:grid;grid-template-columns:150px 1fr 90px;align-items:center;gap:14px}
+.cold b{display:block;height:10px;background:var(--line);position:relative;overflow:hidden}
+.cold b::after{content:"";position:absolute;inset:0;background:var(--coral);transform:scaleX(0);transform-origin:left;transition:transform 1.1s var(--ease) .2s}
+.cold div:last-child b::after{background:var(--green);transition-duration:.35s}
+.cold em{font-style:normal;text-align:right;color:var(--text)}
+.on .cold b::after{transform:scaleX(var(--w))}
+
+/* ---------- ecossistema ---------- */
+.eco{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;width:100%;align-content:center}
+.tool{border:1px solid var(--line);background:var(--bg-2);padding:36px;display:grid;grid-template-columns:140px 1fr;gap:32px;align-items:start;position:relative;min-height:290px}
+.tool .ph{width:140px;height:140px}
+.tool .ph::before{font-size:11px;padding:8px}
+.tool .ph::after{inset:8px}
+.tool .prov{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.tool h3{font-size:32px;font-weight:600;text-transform:uppercase;margin-top:8px;line-height:1.05}
+.tool p{font-size:21px;font-weight:300;color:var(--muted);margin-top:12px;line-height:1.4}
+.tool.on{border-color:var(--line-2)}
+.tool.on .prov{color:var(--coral)}
+.tool.on.was .prov{color:var(--dim)}
+.tool.aws{--p:var(--coral)}
+
+/* ---------- exemplo prático ---------- */
+.ex{display:grid;grid-template-columns:1fr 520px;gap:72px;width:100%;align-items:center;align-content:center}
+.ex .ph{aspect-ratio:4/3;width:100%}
+.ex .pipe{grid-template-columns:repeat(5,1fr);gap:18px}
+.ex .node{min-height:0;padding:22px 20px 24px}
+.ex .node h3{margin-top:48px}
+.ex .node h3{font-size:22px}
+.ex .node p{font-size:17px}
+
+/* ---------- conclusão ---------- */
+.concl{display:grid;grid-template-columns:1fr 1fr;gap:96px;width:100%;align-items:start}
+.concl .thesis{font-size:44px;font-weight:500;line-height:1.15;letter-spacing:-.01em;text-wrap:pretty}
+.concl .thesis em{font-style:normal;color:var(--coral)}
+.concl ol{list-style:none;counter-reset:c}
+.concl ol li{counter-increment:c;display:grid;grid-template-columns:56px 1fr;gap:20px;padding:32px 0;border-top:1px solid var(--line);font-size:30px;line-height:1.3;font-weight:300;color:var(--muted)}
+.concl ol li::before{content:counter(c,decimal-leading-zero);font-family:var(--mono);font-size:15px;color:var(--coral);letter-spacing:.1em;padding-top:8px}
+.concl ol li.on{color:var(--text)}
+.concl ol li:last-child{border-bottom:1px solid var(--line)}
+
+/* ---------- referências ---------- */
+.refs{list-style:none;columns:2;column-gap:96px;width:100%}
+.refs li{break-inside:avoid;padding:22px 0;border-bottom:1px solid var(--line);font-size:23px;line-height:1.35}
+.refs li b{font-weight:600;text-transform:uppercase;display:block;font-size:20px;margin-bottom:4px}
+.refs li span{color:var(--muted);font-weight:300}
+.refs li code{font-family:var(--mono);font-size:16px;color:var(--coral);display:block;margin-top:6px}
+.refs li.todo{color:var(--dim);font-style:italic;font-weight:300}
+.end{margin-top:auto;display:flex;align-items:center;gap:24px;font-family:var(--mono);font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding-top:32px}
+.end i{width:22px;height:22px;background:var(--coral)}
+
+/* ---------- overview (tecla O) ---------- */
+.deck.overview .stage{background:var(--bg)}
+.deck.overview .slide{zoom:.16;position:relative;inset:auto;opacity:1;visibility:visible;transition:none;animation:none;cursor:pointer;outline:6px solid var(--line-2);outline-offset:0}
+.deck.overview .slide.cur{outline-color:var(--coral)}
+.deck.overview .slide .in{animation:none}
+.deck.overview .slide .f{opacity:1;transform:none}
+.deck.overview .grid{position:absolute;inset:0;left:72px;padding:48px;display:grid;grid-template-columns:repeat(4,1fr);gap:40px;align-content:start;overflow:auto}
+.deck:not(.overview) .grid{display:contents}
+
+/* ajuda */
+.stage.on-divider .help{opacity:0}
+.help{transition:opacity .3s;position:absolute;right:28px;bottom:22px;z-index:6;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);display:flex;gap:22px}
+.help kbd{font:inherit;color:var(--muted);border:1px solid var(--line-2);padding:2px 6px;margin-right:6px}
+
+@media (prefers-reduced-motion:reduce){
+  .slide,.slide.cur > .in,.f,.divider.cur,.pipe .track i,.pipe .pk,.grid1k i,.cold b::after{transition:none!important;animation:none!important}
+  .term .cur{animation:none}
+}
+</style>
+</head>
+<body>
+<!--
+DIRECTION CONTRACT
+world: engenharia de nuvem à noite — console escuro, grade técnica, um único coral (serverless.com) que ocupa páginas inteiras nos divisores.
+type: Chakra Petch (cantos cortados, "quadrada") em tudo; JetBrains Mono só onde há código, número ou medida.
+first viewport: SERVERLESS gigante + terminal digitando `serverless deploy` sobre o slot de imagem.
+signature: o pacote coral que percorre o pipeline a cada clique; 1 → 1000 execuções acendendo.
+risk: escuro + accent único é um cluster comum; o coral em campo inteiro e o tipo quadrado são o que o diferencia.
+-->
+<div class="deck" id="deck">
+<div class="stage" id="stage">
+  <aside class="rail" aria-hidden="true">
+    <div class="mark"></div>
+    <div class="sec" id="railSec">Serverless</div>
+    <div class="num"><b id="railCur">01</b><br>—<br><span id="railTot">14</span></div>
+  </aside>
+  <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+  <div class="help" aria-hidden="true"><span><kbd>←</kbd><kbd>→</kbd>navegar</span><span><kbd>O</kbd>visão geral</span><span><kbd>F</kbd>tela cheia</span></div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-arrow" viewBox="0 0 72 24"><path d="M0 12h66M56 2l10 10-10 10" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><rect x="4" y="15" width="16" height="7" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="8" y="3" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-gate" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3v18" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-fn" viewBox="0 0 24 24"><path d="M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 16l3-8M13 8l3 8M9.5 12h5" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="4" y="10" width="16" height="5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="4" y="17" width="16" height="4" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-out" viewBox="0 0 24 24"><path d="M4 12h14M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 4v16" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-img" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 17l5-5 4 4 3-3 6 6" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="7" width="3" height="3" fill="currentColor"/></symbol>
+    <symbol id="i-bucket" viewBox="0 0 24 24"><path d="M4 4h16l-2 17H6z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 9h16" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L5 14h6l-1 8 9-13h-6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <div class="grid" id="grid">
+
+  <!-- 01 · CAPA -->
+  <section class="slide cover" data-section="Arquiteturas de Software" data-enter="terminal">
+    <div class="in">
+      <div>
+        <div class="meta"><span>Arquiteturas de Software</span><i></i><span>Participação III</span><i></i><span>21.09.2026</span></div>
+        <h1>Server<br>less<span>Executar código na nuvem sem gerenciar diretamente os servidores.</span></h1>
+        <dl class="people">
+          <div><dt>Integrantes</dt><dd class="todo">[Nome dos integrantes]</dd></div>
+          <div><dt>Disciplina</dt><dd class="todo">[Disciplina]</dd></div>
+          <div><dt>Professor</dt><dd class="todo">[Professor]</dd></div>
+        </dl>
+      </div>
+      <div class="visual">
+        <figure class="ph" data-label="imagem · capa
+foto ou ilustração vertical
+coloque um &lt;img&gt; dentro deste figure"></figure>
+        <div class="term" aria-label="Terminal executando serverless deploy">
+          <div class="bar"><i></i><i></i><i></i><span>zsh — minha-api</span></div>
+          <pre id="term"></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 · DIVISOR 01 -->
+  <section class="slide divider" data-section="Capítulo 01">
+    <div class="in">
+      <div class="n">01</div>
+      <div class="cap"><h2>O que é</h2><p>Definição, componentes e quem é responsável pelo quê.</p></div>
+    </div>
+  </section>
+
+  <!-- 03 · DEFINIÇÃO -->
+  <section class="slide" data-section="01 · O que é">
+    <div class="in head">
+      <h2>O que é serverless?</h2>
+      <p class="lede">Um modelo de computação em nuvem no qual você <strong>executa código sem gerenciar diretamente os servidores.</strong></p>
+    </div>
+    <div class="body two">
+      <ul class="pts">
+        <li class="f"><h3>Os servidores existem</h3><p>O nome engana: a máquina continua lá, só não é você quem cuida dela.</p></li>
+        <li class="f"><h3>O provedor gerencia</h3><p>Manutenção, disponibilidade e escalabilidade passam para a nuvem.</p></li>
+        <li class="f"><h3>Execução por evento</h3><p>O código roda quando algo acontece, não o tempo todo.</p></li>
+        <li class="f"><h3>Foco na aplicação</h3><p>O time trabalha na lógica de negócio, não na infraestrutura.</p></li>
+      </ul>
+      <figure class="ph" data-label="imagem · conceito
+ilustração ou foto
+proporção livre"></figure>
+    </div>
+  </section>
+
+  <!-- 04 · COMPONENTES -->
+  <section class="slide" data-section="01 · O que é">
+    <div class="in head">
+      <h2>Componentes e responsabilidades</h2>
+      <p class="lede">Quem faz o quê dentro da arquitetura.</p>
+    </div>
+    <div class="body two" style="grid-template-columns:1fr 520px">
+      <table class="tbl">
+        <thead><tr><th>Componente</th><th>Responsabilidade</th></tr></thead>
+        <tbody>
+          <tr class="f"><td>Evento</td><td>Dispara a execução: requisição HTTP, upload, mensagem, agendamento.</td></tr>
+          <tr class="f"><td>API / Gateway</td><td>Recebe a requisição, autentica e roteia para a função correta.</td></tr>
+          <tr class="f"><td>Função</td><td>Executa a lógica de negócio; é pequena, isolada e sem estado.</td></tr>
+          <tr class="f"><td>Banco de dados</td><td>Guarda o estado da aplicação, já que a função não o mantém.</td></tr>
+          <tr class="f"><td>Armazenamento</td><td>Guarda arquivos e mídia, e pode gerar eventos ao receber conteúdo.</td></tr>
+          <tr class="f"><td>Provedor de nuvem</td><td>Provisiona, escala, monitora e mantém toda a infraestrutura.</td></tr>
+        </tbody>
+      </table>
+      <figure class="ph" data-label="imagem · diagrama
+arquitetura serverless
+(gateway → função → banco)"></figure>
+    </div>
+  </section>
+
+  <!-- 05 · DIVISOR 02 -->
+  <section class="slide divider" data-section="Capítulo 02">
+    <div class="in">
+      <div class="n">02</div>
+      <div class="cap"><h2>Como funciona</h2><p>Do evento até a resposta, e o que acontece quando chegam mil de uma vez.</p></div>
+    </div>
+  </section>
+
+  <!-- 06 · FLUXO -->
+  <section class="slide" data-section="02 · Como funciona">
+    <div class="in head">
+      <h2>Do evento até a resposta</h2>
+      <p class="lede">Sem nenhum servidor provisionado por nós.</p>
+    </div>
+    <div class="body" style="flex-direction:column;justify-content:center">
+      <div class="pipe">
+        <div class="track"><i></i></div><div class="pk"></div>
+        <div class="node f"><span class="i">01</span><svg class="ic"><use href="#i-user"/></svg><h3>Usuário</h3><p>Envia a requisição.</p></div>
+        <div class="node f"><span class="i">02</span><svg class="ic"><use href="#i-gate"/></svg><h3>API / Gateway</h3><p>Autentica e roteia.</p></div>
+        <div class="node f"><span class="i">03</span><svg class="ic"><use href="#i-fn"/></svg><h3>Função</h3><p>Executa a lógica.</p></div>
+        <div class="node f"><span class="i">04</span><svg class="ic"><use href="#i-db"/></svg><h3>Banco / Storage</h3><p>Lê e grava o estado.</p></div>
+        <div class="node f"><span class="i">05</span><svg class="ic"><use href="#i-out"/></svg><h3>Resposta</h3><p>Volta ao usuário.</p></div>
+      </div>
+    </div>
+    <p class="foot f">A função só existe enquanto executa: <strong>termina o trabalho, o ambiente é liberado.</strong></p>
+  </section>
+
+  <!-- 07 · ESCALA -->
+  <section class="slide" data-section="02 · Como funciona">
+    <div class="in head">
+      <h2>E quando chegam mil de uma vez?</h2>
+    </div>
+    <div class="body scale">
+      <div>
+        <div class="big" id="bigN">1<small>requisição simultânea</small></div>
+        <p class="note">Mil requisições simultâneas viram mil execuções em paralelo, <strong>sem nenhuma configuração.</strong></p>
+      </div>
+      <div class="grid1k f" id="grid1k" data-count aria-label="Mil execuções em paralelo"></div>
+    </div>
+  </section>
+
+  <!-- 08 · PROBLEMAS -->
+  <section class="slide" data-section="02 · Como funciona">
+    <div class="in head">
+      <h2>Quais problemas resolve?</h2>
+      <p class="lede">A dor operacional de um lado, a resposta da arquitetura do outro.</p>
+    </div>
+    <div class="body pairs" style="align-content:center">
+      <div class="pair f"><span class="a">Gerenciar e manter servidores</span><svg class="arr"><use href="#i-arrow"/></svg><span class="b">O provedor assume a operação</span></div>
+      <div class="pair f"><span class="a">Provisionar infraestrutura à mão</span><svg class="arr"><use href="#i-arrow"/></svg><span class="b">Recursos criados sob demanda</span></div>
+      <div class="pair f"><span class="a">Picos e quedas no número de acessos</span><svg class="arr"><use href="#i-arrow"/></svg><span class="b">Escalabilidade automática</span></div>
+      <div class="pair f"><span class="a">Máquinas ligadas e ociosas</span><svg class="arr"><use href="#i-arrow"/></svg><span class="b">Pagamento pelo uso real</span></div>
+      <div class="pair f"><span class="a">Publicar uma funcionalidade nova</span><svg class="arr"><use href="#i-arrow"/></svg><span class="b">Ciclo de entrega mais curto</span></div>
+    </div>
+  </section>
+
+  <!-- 09 · DIVISOR 03 -->
+  <section class="slide divider" data-section="Capítulo 03">
+    <div class="in">
+      <div class="n">03</div>
+      <div class="cap"><h2>Quando usar</h2><p>Trade-offs, cenários, ferramentas e um caso real do começo ao fim.</p></div>
+    </div>
+  </section>
+
+  <!-- 10 · TRADE-OFFS -->
+  <section class="slide" data-section="03 · Quando usar">
+    <div class="in head">
+      <h2>Vantagens e desvantagens</h2>
+    </div>
+    <div class="body cols">
+      <div class="col pro">
+        <h3>Vantagens</h3>
+        <ul>
+          <li class="f"><svg><use href="#i-check"/></svg><span>Menos gerenciamento de infraestrutura</span></li>
+          <li class="f"><svg><use href="#i-check"/></svg><span>Escalabilidade automática conforme a demanda</span></li>
+          <li class="f"><svg><use href="#i-check"/></svg><span>Pagamento baseado no uso, sem recurso ocioso</span></li>
+          <li class="f"><svg><use href="#i-check"/></svg><span>Publicação rápida de novas funcionalidades</span></li>
+          <li class="f"><svg><use href="#i-check"/></svg><span>Foco do time no código e na regra de negócio</span></li>
+        </ul>
+      </div>
+      <div class="col con">
+        <h3>Desvantagens</h3>
+        <ul>
+          <li class="f"><svg><use href="#i-x"/></svg><span>Dependência do provedor de nuvem</span></li>
+          <li class="f"><svg><use href="#i-x"/></svg><span>Limites do ambiente de execução (tempo, memória)</span></li>
+          <li class="f"><svg><use href="#i-x"/></svg><div>Cold start na primeira chamada de uma função
+            <div class="cold" aria-label="Comparação ilustrativa de latência">
+              <div><span>partida fria</span><b style="--w:1"></b><em>~800 ms</em></div>
+              <div><span>função quente</span><b style="--w:.02"></b><em>~10 ms</em></div>
+            </div>
+          </div></li>
+          <li class="f"><svg><use href="#i-x"/></svg><span>Depuração difícil em sistemas distribuídos</span></li>
+          <li class="f"><svg><use href="#i-x"/></svg><span>Custo que cresce com o volume de execuções</span></li>
+          <li class="f"><svg><use href="#i-x"/></svg><span>Menor controle direto sobre a infraestrutura</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 · CENÁRIOS -->
+  <section class="slide" data-section="03 · Quando usar">
+    <div class="in head">
+      <h2>Onde faz sentido</h2>
+      <p class="lede">A pergunta não é se é melhor, e sim <strong>em qual cenário as características ajudam.</strong></p>
+    </div>
+    <div class="body cols">
+      <div class="col pro">
+        <h3>Indicado para</h3>
+        <ul>
+          <li class="f"><svg><use href="#i-check"/></svg><span>APIs e backends de aplicações web</span></li>
+          <li class="f"><svg><use href="#i-check"/></svg><span>Backends de aplicações mobile</span></li>
+          <li class="f"><svg><use href="#i-check"/></svg><span>Processamento de arquivos e imagens</span></li>
+          <li class="f"><svg><use href="#i-check"/></svg><span>Automação de tarefas e rotinas agendadas</span></li>
+          <li class="f"><svg><use href="#i-check"/></svg><span>Sistemas orientados a eventos</span></li>
+        </ul>
+      </div>
+      <div class="col con">
+        <h3>Avalie outras opções quando</h3>
+        <ul>
+          <li class="f"><svg><use href="#i-x"/></svg><span>A aplicação precisa de execução contínua</span></li>
+          <li class="f"><svg><use href="#i-x"/></svg><span>É preciso controle fino da infraestrutura</span></li>
+          <li class="f"><svg><use href="#i-x"/></svg><span>O processamento é longo demais para os limites</span></li>
+          <li class="f"><svg><use href="#i-x"/></svg><span>A dependência de um provedor é um risco relevante</span></li>
+          <li class="f"><svg><use href="#i-x"/></svg><span>O volume constante torna o custo por execução alto</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 · ECOSSISTEMA -->
+  <section class="slide" data-section="03 · Quando usar">
+    <div class="in head">
+      <h2>Tecnologias e ferramentas</h2>
+      <p class="lede">O papel de cada serviço dentro do ecossistema.</p>
+    </div>
+    <div class="body eco">
+      <div class="tool f aws"><figure class="ph" data-label="logo
+lambda"></figure><div><div class="prov">AWS</div><h3>Lambda</h3><p>Executa a função em resposta a um evento. É o FaaS mais conhecido.</p></div></div>
+      <div class="tool f aws"><figure class="ph" data-label="logo
+api gateway"></figure><div><div class="prov">AWS</div><h3>API Gateway</h3><p>Porta de entrada HTTP: recebe, autentica e encaminha às funções.</p></div></div>
+      <div class="tool f aws"><figure class="ph" data-label="logo
+s3"></figure><div><div class="prov">AWS</div><h3>S3</h3><p>Armazena arquivos e dispara eventos quando recebe conteúdo novo.</p></div></div>
+      <div class="tool f"><figure class="ph" data-label="logo
+azure"></figure><div><div class="prov">Azure</div><h3>Azure Functions</h3><p>Equivalente da Microsoft para execução de funções por evento.</p></div></div>
+      <div class="tool f"><figure class="ph" data-label="logo
+cloud functions"></figure><div><div class="prov">Google Cloud</div><h3>Cloud Functions</h3><p>Funções gerenciadas dentro do ecossistema do Google Cloud.</p></div></div>
+      <div class="tool f"><figure class="ph" data-label="logo
+cloud run"></figure><div><div class="prov">Google Cloud</div><h3>Cloud Run</h3><p>Contêineres sem servidor, para quando a função pura não basta.</p></div></div>
+    </div>
+  </section>
+
+  <!-- 13 · EXEMPLO PRÁTICO -->
+  <section class="slide" data-section="03 · Quando usar">
+    <div class="in head">
+      <h2>Exemplo prático: upload de imagem</h2>
+      <p class="lede">O mesmo fluxo da arquitetura, agora com serviços reais.</p>
+    </div>
+    <div class="body ex">
+      <div class="pipe">
+        <div class="track"><i></i></div><div class="pk"></div>
+        <div class="node f"><span class="i">01</span><svg class="ic"><use href="#i-img"/></svg><h3>Upload</h3><p>O usuário envia a foto pelo aplicativo.</p></div>
+        <div class="node f"><span class="i">02</span><svg class="ic"><use href="#i-bucket"/></svg><h3>Amazon S3</h3><p>O arquivo chega ao bucket.</p></div>
+        <div class="node f"><span class="i">03</span><svg class="ic"><use href="#i-bolt"/></svg><h3>Evento</h3><p>O storage avisa que há arquivo novo.</p></div>
+        <div class="node f"><span class="i">04</span><svg class="ic"><use href="#i-fn"/></svg><h3>Lambda</h3><p>Redimensiona e gera a miniatura.</p></div>
+        <div class="node f"><span class="i">05</span><svg class="ic"><use href="#i-db"/></svg><h3>Resultado</h3><p>Miniatura no S3 e registro no banco.</p></div>
+      </div>
+      <figure class="ph" data-label="imagem · demonstração
+screenshot do console
+(bucket, função ou logs)"></figure>
+    </div>
+    <p class="foot f">Nenhum servidor ficou ligado esperando o upload. <strong>A função existiu apenas durante o processamento, e a cobrança corresponde a esse tempo.</strong></p>
+  </section>
+
+  <!-- 14 · CONCLUSÃO -->
+  <section class="slide" data-section="Conclusão">
+    <div class="in head">
+      <h2>Conclusão</h2>
+    </div>
+    <div class="body concl">
+      <p class="thesis">Serverless troca o controle da infraestrutura por agilidade e escala automática. <em>É uma escolha de cenário, não um upgrade universal.</em></p>
+      <ol>
+        <li class="f">O provedor cuida do servidor; o time cuida do código e da regra de negócio.</li>
+        <li class="f">Resolve ociosidade, picos de acesso e provisionamento manual.</li>
+        <li class="f">Cold start, limites de execução e dependência do provedor continuam pesando.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 15 · REFERÊNCIAS -->
+  <section class="slide" data-section="Referências">
+    <div class="in head">
+      <h2>Referências</h2>
+    </div>
+    <div class="body" style="display:block">
+      <ul class="refs">
+        <li><b>AWS</b><span>Computação sem servidor.</span><code>aws.amazon.com/serverless</code></li>
+        <li><b>IBM</b><span>What is serverless?</span><code>ibm.com/topics/serverless</code></li>
+        <li><b>Databricks</b><span>What is Serverless Computing?</span><code>databricks.com/glossary/serverless-computing</code></li>
+        <li><b>Red Hat</b><span>O que é serverless?</span><code>redhat.com/pt-br/topics/cloud-native-apps/what-is-serverless</code></li>
+        <li><b>Alura</b><span>Arquitetura Serverless.</span><code>alura.com.br</code></li>
+        <li><b>Serverless, Inc.</b><span>Serverless Framework.</span><code>serverless.com</code></li>
+        <li class="todo">[Acrescentar demais fontes consultadas]</li>
+      </ul>
+    </div>
+    <div class="end"><i></i><span>Obrigado · perguntas?</span></div>
+  </section>
+
+  </div><!-- /grid -->
+</div>
+</div>
+
+<script>
+(() => {
+  const deck = document.getElementById('deck');
+  const stage = document.getElementById('stage');
+  const slides = [...document.querySelectorAll('.slide')];
+  const bar = document.getElementById('bar');
+  const railSec = document.getElementById('railSec');
+  const railCur = document.getElementById('railCur');
+  const railTot = document.getElementById('railTot');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const pad = n => String(n).padStart(2, '0');
+  let cur = -1;
+  railTot.textContent = pad(slides.length);
+
+  /* ---- ajuste do palco ao viewport ---- */
+  function fit() {
+    const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    stage.style.transform = `scale(${s})`;
+    stage.style.left = `${(innerWidth - 1920 * s) / 2}px`;
+    stage.style.top = `${(innerHeight - 1080 * s) / 2}px`;
+  }
+  addEventListener('resize', fit); fit();
+
+  /* ---- grade 1 → 1000 ---- */
+  const g = document.getElementById('grid1k');
+  if (g) {
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < 1000; i++) { const c = document.createElement('i'); c.style.setProperty('--d', String(Math.round(Math.sqrt(i) * 28))); frag.appendChild(c); }
+    g.appendChild(frag);
+  }
+  const bigN = document.getElementById('bigN');
+  function count(to) {
+    if (!bigN) return;
+    const small = bigN.querySelector('small');
+    const setN = (n, label) => { bigN.firstChild.textContent = n; small.textContent = label; };
+    if (to === 1 || reduce) { setN(to, to === 1 ? 'requisição simultânea' : 'execuções em paralelo'); return; }
+    const t0 = performance.now(), dur = 1100;
+    (function tick(t) {
+      const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      setN(Math.round(1 + 999 * e), 'execuções em paralelo');
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+
+  /* ---- pipeline: pacote acompanha o nó revelado ---- */
+  function movePacket(pipe) {
+    const nodes = [...pipe.querySelectorAll('.node')];
+    const on = nodes.filter(n => n.classList.contains('on'));
+    const pk = pipe.querySelector('.pk'), tr = pipe.querySelector('.track i');
+    if (!on.length) { pk.classList.remove('show'); tr.style.transform = 'scaleX(0)'; return; }
+    const last = on[on.length - 1];
+    const x = last.offsetLeft + last.offsetWidth / 2;
+    pk.style.left = x + 'px'; pk.classList.add('show'); tr.style.transform = `scaleX(${x / pipe.offsetWidth})`;
+  }
+
+  /* ---- terminal ---- */
+  const termEl = document.getElementById('term');
+  const script = [
+    ['<span class="p">$</span> <span class="c">serverless deploy</span>', 'type'],
+    ['<span class="k">Deploying "minha-api" to stage "dev" (us-east-1)</span>', 900],
+    ['', 200],
+    ['<span class="ok">✔</span> <span class="c">Service deployed</span> <span class="k">(52s)</span>', 1400],
+    ['', 100],
+    ['<span class="k">endpoint:</span>  <span class="c">POST</span> https://x7q2.execute-api.amazonaws.com/imagens', 500],
+    ['<span class="k">function:</span>  processarImagem <span class="k">(1.2 MB)</span>', 400],
+    ['', 200],
+    ['<span class="p">$</span> <span class="cur"></span>', 700],
+  ];
+  let termRun = 0;
+  function terminal() {
+    if (!termEl) return;
+    const run = ++termRun;
+    termEl.innerHTML = '';
+    if (reduce) { termEl.innerHTML = script.map(l => `<div class="line show">${l[0] || '&nbsp;'}</div>`).join(''); return; }
+    const lines = script.map(l => { const d = document.createElement('div'); d.className = 'line'; d.innerHTML = l[0] || '&nbsp;'; termEl.appendChild(d); return d; });
+    let delay = 500;
+    script.forEach(([html, mode], i) => {
+      if (mode === 'type') {
+        const text = 'serverless deploy';
+        lines[i].innerHTML = '<span class="p">$</span> <span class="c"></span><span class="cur"></span>';
+        lines[i].classList.add('show');
+        const c = lines[i].querySelector('.c');
+        for (let k = 1; k <= text.length; k++) setTimeout(() => { if (run === termRun) c.textContent = text.slice(0, k); }, delay + k * 55);
+        delay += text.length * 55 + 350;
+        setTimeout(() => { if (run === termRun) lines[i].querySelector('.cur')?.remove(); }, delay);
+      } else {
+        delay += mode;
+        setTimeout(() => { if (run === termRun) lines[i].classList.add('show'); }, delay);
+      }
+    });
+  }
+
+  /* ---- fragmentos ---- */
+  const frags = s => [...s.querySelectorAll('.f')];
+  function mark(s) { // o último fragmento visível é o foco; anteriores ficam "was"
+    const on = frags(s).filter(f => f.classList.contains('on'));
+    on.forEach((f, i) => f.classList.toggle('was', i < on.length - 1));
+  }
+  function afterFrag(f, s) {
+    mark(s);
+    const pipe = f.closest('.pipe'); if (pipe) movePacket(pipe);
+    if (f.id === 'grid1k') count(f.classList.contains('on') ? 1000 : 1);
+  }
+  function reveal(f, s) { f.classList.add('on'); afterFrag(f, s); }
+  function hide(f, s) { f.classList.remove('on', 'was'); afterFrag(f, s); }
+
+  /* ---- navegação ---- */
+  function show(n, { toEnd = false } = {}) {
+    n = Math.max(0, Math.min(slides.length - 1, n));
+    if (n === cur) return;
+    if (cur >= 0) slides[cur].classList.remove('cur');
+    cur = n;
+    const s = slides[cur];
+    s.classList.add('cur');
+    frags(s).forEach(f => f.classList.toggle('on', toEnd) || f.classList.remove('was'));
+    if (toEnd) { mark(s); s.querySelectorAll('.pipe').forEach(movePacket); if (s.querySelector('#grid1k')) count(1000); }
+    else { s.querySelectorAll('.pipe').forEach(movePacket); if (s.querySelector('#grid1k')) count(1); }
+    if (s.dataset.enter === 'terminal') terminal(); else termRun++;
+    stage.classList.toggle('on-divider', s.classList.contains('divider'));
+    railSec.textContent = s.dataset.section || '';
+    railCur.textContent = pad(cur + 1);
+    bar.style.transform = `scaleX(${cur / (slides.length - 1)})`;
+    history.replaceState(null, '', '#' + (cur + 1));
+  }
+  function next() {
+    const s = slides[cur], f = frags(s).find(x => !x.classList.contains('on'));
+    if (f) reveal(f, s); else show(cur + 1);
+  }
+  function prev() {
+    const s = slides[cur], on = frags(s).filter(x => x.classList.contains('on'));
+    if (on.length) hide(on[on.length - 1], s); else show(cur - 1, { toEnd: true });
+  }
+  function overview(force) {
+    const on = deck.classList.toggle('overview', force);
+    if (on) slides[cur].scrollIntoView({ block: 'center' });
+  }
+  slides.forEach((s, i) => s.addEventListener('click', () => { if (deck.classList.contains('overview')) { overview(false); show(i); } }));
+
+  addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key;
+    if (deck.classList.contains('overview') && (k === 'Escape' || k === 'o' || k === 'O')) { overview(false); return; }
+    if (k === 'ArrowRight' || k === ' ' || k === 'PageDown' || k === 'Enter') { e.preventDefault(); next(); }
+    else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') { e.preventDefault(); prev(); }
+    else if (k === 'ArrowDown') { e.preventDefault(); show(cur + 1); }
+    else if (k === 'ArrowUp') { e.preventDefault(); show(cur - 1, { toEnd: true }); }
+    else if (k === 'Home') show(0);
+    else if (k === 'End') show(slides.length - 1, { toEnd: true });
+    else if (k === 'o' || k === 'O') overview();
+    else if (k === 'f' || k === 'F') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  });
+  // clique/toque no palco avança (fora do modo visão geral)
+  stage.addEventListener('click', e => { if (!deck.classList.contains('overview') && !e.target.closest('a')) next(); });
+
+  window.deck = { show, next, prev, count: slides.length };
+  const start = parseInt(location.hash.slice(1), 10);
+  show(Number.isFinite(start) && start >= 1 ? start - 1 : 0);
+})();
+</script>
+</body>
+</html>
