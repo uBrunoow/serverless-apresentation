@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 460" width="640" height="460" role="img" aria-labelledby="t">
+  <title id="t">Arquitetura serverless: usuário dispara um evento, o gateway roteia para a função, que lê e grava no banco e no armazenamento; tudo dentro do provedor de nuvem.</title>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0L10 5 0 10" fill="none" stroke="#9AA4B8" stroke-width="1.6"/>
+    </marker>
+    <marker id="ac" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0L10 5 0 10" fill="none" stroke="#FD5750" stroke-width="1.6"/>
+    </marker>
+    <style>
+      .lb{font-family:"JetBrains Mono",ui-monospace,"DejaVu Sans Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;fill:#9AA4B8;text-anchor:middle}
+      .lb.dim{fill:#5E6879;text-anchor:start}
+      .lb.hi{fill:#FD5750}
+      .bx{fill:#151A23;stroke:#EEF1F6;stroke-opacity:.18;stroke-width:1.4}
+      .ic{fill:none;stroke:#EEF1F6;stroke-width:1.8;stroke-linejoin:round}
+      .ln{fill:none;stroke:#9AA4B8;stroke-width:1.6}
+    </style>
+  </defs>
+
+  <!-- provedor de nuvem -->
+  <rect x="140.5" y="52.5" width="483" height="372" fill="none" stroke="#FD5750" stroke-width="1.2" stroke-dasharray="6 6" opacity=".85"/>
+  <rect x="140.5" y="52.5" width="483" height="372" fill="#FD5750" opacity=".025"/>
+  <text class="lb dim" x="156" y="76">Provedor de nuvem · provisiona · escala · mantém</text>
+
+  <!-- usuário -->
+  <g transform="translate(72 230)">
+    <g class="ic" transform="translate(-20 -20) scale(1.6667)"><rect x="4" y="15" width="16" height="7"/><rect x="8" y="3" width="8" height="8"/></g>
+    <text class="lb" x="0" y="66">Usuário</text>
+  </g>
+
+  <!-- evento: usuário -> gateway -->
+  <path class="ln" d="M110 230H188" marker-end="url(#a)" stroke="#FD5750"/>
+  <g transform="translate(149 230)">
+    <rect x="-16" y="-16" width="32" height="32" fill="#0B0E14"/>
+    <path d="M2-13L-7 1h6l-1 12 9-13H1z" fill="none" stroke="#FD5750" stroke-width="1.8" stroke-linejoin="round"/>
+  </g>
+  <text class="lb hi" x="149" y="196">Evento</text>
+
+  <!-- gateway -->
+  <g transform="translate(232 230)">
+    <rect class="bx" x="-40" y="-40" width="80" height="80"/>
+    <g class="ic" transform="translate(-20 -20) scale(1.6667)"><rect x="3" y="3" width="18" height="18"/><path d="M3 12h18M12 3v18"/></g>
+    <text class="lb" x="0" y="66">API / Gateway</text>
+  </g>
+
+  <path class="ln" d="M272 230H332" marker-end="url(#a)"/>
+
+  <!-- função -->
+  <g transform="translate(376 230)">
+    <rect class="bx" x="-40" y="-40" width="80" height="80" stroke="#FD5750" stroke-opacity="1"/>
+    <text x="0" y="9" font-family="JetBrains Mono,ui-monospace,monospace" font-size="26" fill="#FD5750" text-anchor="middle">ƒ(x)</text>
+    <text class="lb hi" x="0" y="66">Função</text>
+  </g>
+
+  <!-- função -> banco (leitura e escrita) -->
+  <path class="ln" d="M416 214H456V150H492" marker-end="url(#a)" marker-start="url(#a)"/>
+  <!-- função -> armazenamento -->
+  <path class="ln" d="M416 246H456V316H492"  marker-end="url(#a)"/>
+  <!-- armazenamento gera evento de volta para a função -->
+  <path class="ln" d="M496 340H478V404H344V274" stroke="#FD5750" stroke-dasharray="4 4" marker-end="url(#ac)" opacity=".8"/>
+  <g transform="translate(412 404)">
+    <rect x="-9" y="-9" width="18" height="18" fill="#10141C"/>
+    <path d="M1-7L-4 1h3l-.5 6L4-1H1z" fill="none" stroke="#FD5750" stroke-width="1.4" stroke-linejoin="round"/>
+  </g>
+
+  <!-- banco de dados -->
+  <g transform="translate(536 150)">
+    <rect class="bx" x="-40" y="-40" width="80" height="80"/>
+    <g class="ic"><ellipse cx="0" cy="-14" rx="16" ry="6"/><path d="M-16-14V14c0 3.3 7.2 6 16 6s16-2.7 16-6V-14"/><path d="M-16 0c0 3.3 7.2 6 16 6s16-2.7 16-6"/></g>
+    <text class="lb" x="0" y="64">Banco de dados</text>
+  </g>
+
+  <!-- armazenamento -->
+  <g transform="translate(536 316)">
+    <rect class="bx" x="-40" y="-40" width="80" height="80"/>
+    <g class="ic"><path d="M-16-6l16-8 16 8v14l-16 8-16-8z"/><path d="M-16-6l16 8 16-8M0 2v14"/></g>
+    <text class="lb" x="0" y="66">Armazenamento</text>
+  </g>
+</svg>

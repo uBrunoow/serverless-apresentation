@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 1310" width="1040" height="1310" role="img" aria-labelledby="t">
+  <title id="t">Blocos de código sobem em direção a uma nuvem: o deploy sem servidor.</title>
+  <defs>
+    <style>
+      .c{fill:none;stroke:#FD5750;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+      .d{fill:none;stroke:#FD5750;stroke-width:1.6;stroke-dasharray:3 7;stroke-linecap:round}
+      .b{fill:#FD5750}
+      .g{font-family:"JetBrains Mono",ui-monospace,"DejaVu Sans Mono",monospace;fill:#FD5750;text-anchor:middle}
+      .col{animation:rise 7s ease-in-out infinite}
+      .col.k2{animation-delay:-2.3s}
+      .col.k3{animation-delay:-4.6s}
+      @keyframes rise{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+      @media (prefers-reduced-motion:reduce){.col{animation:none}}
+    </style>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset=".40" stop-color="#FD5750" stop-opacity="0"/>
+      <stop offset=".62" stop-color="#FD5750" stop-opacity="1"/>
+    </linearGradient>
+    <mask id="m"><rect x="0" y="0" width="1040" height="1310" fill="url(#fade)"/></mask>
+  </defs>
+
+  <!-- nuvem -->
+  <g transform="translate(590 400)">
+    <path class="c" d="M-210 110C-290 110-290 -10-200 -18C-200 -95-95 -130-50 -70C-15 -150 150 -150 170 -40C245 -50 285 40 240 85C290 105 270 110 220 110Z"/>
+    <path class="d" d="M-150 -2C-95 -60 -10 -55 30 -8"/>
+    <!-- glifo de função no centro da nuvem -->
+    <text class="g" x="20" y="60" font-size="54">ƒ(x)</text>
+  </g>
+
+  <!-- trilhas de circuito saindo da nuvem -->
+  <path class="c" d="M830 460H930L980 510H1040"/>
+  <path class="d" d="M860 500H960L1010 550H1040"/>
+  <circle class="c" cx="930" cy="460" r="7" fill="#0B0E14"/>
+  <path class="c" d="M380 500H250L200 450H80"/>
+  <circle class="c" cx="250" cy="500" r="7" fill="#0B0E14"/>
+  <path class="d" d="M400 540H300L240 600H120"/>
+  <path class="c" d="M680 60V180L700 200V300"/>
+  <circle class="c" cx="680" cy="60" r="7" fill="#0B0E14"/>
+  <path class="d" d="M520 0V160L500 180V290"/>
+
+  <!-- guias tracejadas: dos blocos até a nuvem -->
+  <path class="d" d="M560 540V1130"/>
+  <path class="d" d="M760 520V1120"/>
+  <path class="d" d="M900 560V1140"/>
+
+  <!-- blocos de código subindo (mascarados para desvanecer perto da nuvem) -->
+  <g mask="url(#m)" transform="translate(0 -70)">
+    <!-- coluna 1 -->
+    <g class="col k1">
+      <rect class="b" x="470" y="1200" width="60" height="12" rx="2" opacity=".55"/>
+      <rect class="b" x="470" y="1170" width="150" height="12" rx="2" opacity=".55"/>
+      <rect class="c" x="470" y="1140" width="110" height="12" rx="2"/>
+      <rect class="b" x="490" y="1110" width="120" height="12" rx="2" opacity=".55"/>
+      <rect class="b" x="490" y="1080" width="90" height="12" rx="2" opacity=".55"/>
+      <rect class="c" x="470" y="1040" width="50" height="12" rx="2"/>
+      <rect class="c" x="470" y="990" width="160" height="12" rx="2"/>
+      <rect class="b" x="490" y="960" width="80" height="12" rx="2" opacity=".55"/>
+      <rect class="c" x="490" y="920" width="120" height="12" rx="2"/>
+      <rect class="c" x="470" y="870" width="70" height="12" rx="2"/>
+      <rect class="b" x="470" y="820" width="130" height="12" rx="2" opacity=".55"/>
+      <rect class="c" x="490" y="770" width="100" height="12" rx="2"/>
+      <rect class="c" x="470" y="710" width="60" height="12" rx="2"/>
+      <rect class="b" x="470" y="650" width="110" height="12" rx="2" opacity=".55"/>
+      <rect class="c" x="470" y="590" width="80" height="12" rx="2"/>
+      <text class="g" x="560" y="1250" font-size="26">{ }</text>
+    </g>
+    <!-- coluna 2 -->
+    <g class="col k2">
+      <rect class="c" x="690" y="1180" width="140" height="12" rx="2"/>
+      <rect class="b" x="710" y="1150" width="70" height="12" rx="2" opacity=".55"/>
+      <rect class="b" x="710" y="1120" width="120" height="12" rx="2" opacity=".55"/>
+      <rect class="c" x="690" y="1080" width="40" height="12" rx="2"/>
+      <rect class="c" x="690" y="1030" width="130" height="12" rx="2"/>
+      <rect class="b" x="710" y="1000" width="100" height="12" rx="2" opacity=".55"/>
+      <rect class="c" x="710" y="960" width="60" height="12" rx="2"/>
+      <rect class="c" x="690" y="900" width="150" height="12" rx="2"/>
+      <rect class="b" x="690" y="850" width="90" height="12" rx="2" opacity=".55"/>
+      <rect class="c" x="710" y="800" width="110" height="12" rx="2"/>
+      <rect class="c" x="690" y="740" width="70" height="12" rx="2"/>
+      <rect class="b" x="690" y="680" width="120" height="12" rx="2" opacity=".55"/>
+      <rect class="c" x="690" y="620" width="50" height="12" rx="2"/>
+      <text class="g" x="760" y="1240" font-size="26">ƒ</text>
+    </g>
+    <!-- coluna 3 -->
+    <g class="col k3">
+      <rect class="b" x="860" y="1210" width="100" height="12" rx="2" opacity=".55"/>
+      <rect class="c" x="860" y="1170" width="60" height="12" rx="2"/>
+      <rect class="c" x="880" y="1130" width="90" height="12" rx="2"/>
+      <rect class="b" x="880" y="1100" width="50" height="12" rx="2" opacity=".55"/>
+      <rect class="c" x="860" y="1050" width="120" height="12" rx="2"/>
+      <rect class="c" x="860" y="1000" width="80" height="12" rx="2"/>
+      <rect class="b" x="880" y="960" width="100" height="12" rx="2" opacity=".55"/>
+      <rect class="c" x="860" y="900" width="60" height="12" rx="2"/>
+      <rect class="b" x="860" y="840" width="110" height="12" rx="2" opacity=".55"/>
+      <rect class="c" x="880" y="780" width="70" height="12" rx="2"/>
+      <rect class="c" x="860" y="710" width="90" height="12" rx="2"/>
+      <rect class="b" x="860" y="640" width="60" height="12" rx="2" opacity=".55"/>
+      <text class="g" x="900" y="1260" font-size="26">=&gt;</text>
+    </g>
+  </g>
+
+</svg>

@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 480" width="720" height="480" role="img" aria-labelledby="t">
+  <title id="t">Tradicional versus serverless: à esquerda, um rack de servidores ligado o tempo todo e mantido manualmente; à direita, uma nuvem em que pequenas funções só executam quando um evento chega.</title>
+  <defs>
+    <style>
+      .h{font-family:"JetBrains Mono",ui-monospace,"DejaVu Sans Mono",monospace;font-size:13px;letter-spacing:.18em;text-transform:uppercase;text-anchor:middle}
+      .s{font-family:"JetBrains Mono",ui-monospace,"DejaVu Sans Mono",monospace;font-size:10.5px;letter-spacing:.06em;text-anchor:middle}
+      .lb{font-family:"JetBrains Mono",ui-monospace,"DejaVu Sans Mono",monospace;font-size:10.5px;letter-spacing:.06em}
+      .mu{fill:#9AA4B8}.di{fill:#5E6879}.co{fill:#FD5750}.tx{fill:#EEF1F6}
+      .rk{fill:none;stroke:#9AA4B8;stroke-width:1.8;stroke-linejoin:round}
+      .rkd{fill:none;stroke:#5E6879;stroke-width:1.4}
+      .cl{fill:none;stroke:#FD5750;stroke-width:2;stroke-linejoin:round}
+      .fn{fill:#151A23;stroke:#5E6879;stroke-width:1.4}
+      .fn.on{stroke:#FD5750}
+      .bolt{fill:none;stroke:#FD5750;stroke-width:1.8;stroke-linejoin:round}
+      .ln{fill:none;stroke:#5E6879;stroke-width:1.2;stroke-dasharray:3 4}
+      .led{animation:blink 2.4s steps(1) infinite}
+      .led.l2{animation-delay:-.8s}.led.l3{animation-delay:-1.6s}
+      @keyframes blink{0%,60%{opacity:1}61%,100%{opacity:.25}}
+      .pulse{animation:pulse 2.8s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+      .pulse.p2{animation-delay:-1.4s}
+      @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+      @media (prefers-reduced-motion:reduce){.led,.pulse{animation:none}}
+    </style>
+  </defs>
+
+  <!-- divisor -->
+  <path d="M360 40V440" stroke="#EEF1F6" stroke-opacity=".14" stroke-width="1"/>
+
+  <!-- ===== TRADICIONAL ===== -->
+  <text class="h mu" x="180" y="46">Tradicional</text>
+  <text class="s di" x="180" y="66">gerenciamento manual · 24/7</text>
+
+  <!-- rack -->
+  <g transform="translate(150 250)">
+    <rect class="rk" x="-64" y="-140" width="128" height="280" rx="3"/>
+    <path class="rkd" d="M-64 -128H64M-64 128H64"/>
+    <!-- unidades -->
+    <g class="rkd">
+      <rect x="-54" y="-116" width="108" height="30"/>
+      <rect x="-54" y="-78" width="108" height="30"/>
+      <rect x="-54" y="-40" width="108" height="30"/>
+      <rect x="-54" y="-2" width="108" height="30"/>
+      <rect x="-54" y="36" width="108" height="30"/>
+      <rect x="-54" y="74" width="108" height="30"/>
+      <path d="M-44 -101h34M-44 -63h34M-44 -25h34M-44 13h34M-44 51h34M-44 89h34"/>
+    </g>
+    <!-- leds -->
+    <g fill="#9AA4B8">
+      <circle class="led" cx="42" cy="-101" r="2.6"/><circle class="led l2" cx="42" cy="-63" r="2.6"/><circle class="led l3" cx="42" cy="-25" r="2.6"/>
+      <circle class="led l2" cx="42" cy="13" r="2.6"/><circle class="led" cx="42" cy="51" r="2.6"/><circle class="led l3" cx="42" cy="89" r="2.6"/>
+    </g>
+    <!-- pés -->
+    <path class="rk" d="M-50 140v10M50 140v10"/>
+  </g>
+
+  <!-- tarefas manuais -->
+  <g class="lb di">
+    <path class="ln" d="M214 150H232"/><text x="238" y="154">provisionar</text>
+    <path class="ln" d="M214 190H232"/><text x="238" y="194">atualizar SO</text>
+    <path class="ln" d="M214 230H232"/><text x="238" y="234">patches</text>
+    <path class="ln" d="M214 270H232"/><text x="238" y="274">monitorar</text>
+    <path class="ln" d="M214 310H232"/><text x="238" y="314">escalar à mão</text>
+  </g>
+
+  <!-- ociosidade -->
+  <g transform="translate(60 420)">
+    <text class="lb di" x="0" y="-8">capacidade em uso</text>
+    <rect x="0" y="0" width="240" height="8" fill="none" stroke="#5E6879" stroke-width="1"/>
+    <rect x="1" y="1" width="46" height="6" fill="#9AA4B8"/>
+    <text class="lb di" x="0" y="26">~20% em uso · o ocioso é pago</text>
+  </g>
+
+  <!-- ===== SERVERLESS ===== -->
+  <text class="h co" x="540" y="46">Serverless</text>
+  <text class="s di" x="540" y="66">execução sob demanda</text>
+
+  <!-- nuvem -->
+  <g transform="translate(540 230)">
+    <path class="cl" d="M-120 70C-170 70-170 -10-110 -14C-110 -60-50 -80-22 -46C0 -96 100 -96 112 -30C160 -36 184 22 154 52C186 64 172 70 140 70Z"/>
+
+    <!-- funções: só as que receberam evento estão ativas -->
+    <g transform="translate(-66 18)">
+      <rect class="fn on pulse" x="-20" y="-20" width="40" height="40"/>
+      <text class="s co" x="0" y="6" font-size="20">ƒ</text>
+    </g>
+    <g transform="translate(6 -12)">
+      <rect class="fn" x="-20" y="-20" width="40" height="40"/>
+      <text class="s di" x="0" y="6" font-size="20">ƒ</text>
+    </g>
+    <g transform="translate(78 22)">
+      <rect class="fn on pulse p2" x="-20" y="-20" width="40" height="40"/>
+      <text class="s co" x="0" y="6" font-size="20">ƒ</text>
+    </g>
+  </g>
+
+  <!-- eventos (raios) chegando de fora -->
+  <g class="bolt">
+    <path transform="translate(410 132)" d="M4-12L-6 2h6l-1 10 8-12H3z"/>
+    <path transform="translate(470 100)" d="M4-12L-6 2h6l-1 10 8-12H3z"/>
+    <path transform="translate(660 132)" d="M4-12L-6 2h6l-1 10 8-12H3z"/>
+  </g>
+  <g fill="none" stroke="#FD5750" stroke-width="1.2" stroke-dasharray="3 4" opacity=".8">
+    <path d="M414 142L466 228"/>
+    <path d="M472 110L546 196"/>
+    <path d="M656 142L622 226"/>
+  </g>
+  <text class="lb co" x="384" y="104">evento</text>
+  <text class="lb co" x="700" y="104" text-anchor="end">evento</text>
+  <text class="lb di" x="500" y="330" text-anchor="middle" style="text-anchor:middle">ativa · executa · libera</text>
+
+  <!-- uso: pago por execução -->
+  <g transform="translate(420 420)">
+    <text class="lb di" x="0" y="-8">capacidade em uso</text>
+    <rect x="0" y="0" width="240" height="8" fill="none" stroke="#5E6879" stroke-width="1"/>
+    <g fill="#FD5750">
+      <rect x="1" y="1" width="18" height="6"/><rect x="41" y="1" width="9" height="6"/><rect x="84" y="1" width="26" height="6"/>
+      <rect x="150" y="1" width="12" height="6"/><rect x="196" y="1" width="20" height="6"/>
+    </g>
+    <text class="lb di" x="0" y="26">paga só o tempo de execução</text>
+  </g>
+</svg>

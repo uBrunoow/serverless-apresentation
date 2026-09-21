@@ -127,20 +127,22 @@ h2{font-size:76px;max-width:1200px}
 .divider ~ .rail-dark{display:none}
 
 /* ---------- definição: lista + imagem ---------- */
-.two{display:grid;grid-template-columns:1fr 600px;gap:96px;width:100%}
+.two{display:grid;grid-template-columns:1fr 720px;gap:80px;width:100%;align-items:center}
 .pts{list-style:none;display:grid;gap:0}
 .pts li{display:grid;grid-template-columns:1fr;gap:6px;padding:26px 0;border-top:1px solid var(--line)}
 .pts li:last-child{border-bottom:1px solid var(--line)}
 .pts h3{font-size:30px;font-weight:600;text-transform:uppercase;letter-spacing:-.005em}
 .pts p{font-size:22px;font-weight:300;color:var(--muted);line-height:1.4;max-width:640px}
 .pts li.on h3{color:var(--text)}
-.two .ph{align-self:stretch}
+.two .ph{aspect-ratio:16/9;width:100%}
+.two .ph:has(img){aspect-ratio:auto}
+.two .ph img{position:static;height:auto;object-fit:contain}
 
 /* ---------- componentes: tabela ---------- */
 .tbl{width:100%;border-collapse:collapse;font-size:22px}
 .tbl th{font-family:var(--mono);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-align:left;padding:0 0 14px;border-bottom:1px solid var(--line-2);font-weight:400}
-.tbl td{padding:22px 40px 22px 0;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.4}
-.tbl td:first-child{font-weight:600;text-transform:uppercase;font-size:24px;width:300px;white-space:nowrap}
+.tbl td{padding:17px 40px 17px 0;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.4}
+.tbl td:first-child{font-weight:600;text-transform:uppercase;font-size:24px;width:280px;white-space:nowrap}
 .tbl td:last-child{color:var(--muted);font-weight:300;padding-right:0}
 .tbl tr.on td:first-child{color:var(--coral)}
 .tbl tr.on.was td:first-child{color:var(--text)}
@@ -220,6 +222,7 @@ h2{font-size:76px;max-width:1200px}
 .tool .ph{width:140px;height:140px}
 .tool .ph::before{font-size:11px;padding:8px}
 .tool .ph::after{inset:8px}
+.tool .ph img{object-fit:cover}
 .tool .prov{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
 .tool h3{font-size:32px;font-weight:600;text-transform:uppercase;margin-top:8px;line-height:1.05}
 .tool p{font-size:21px;font-weight:300;color:var(--muted);margin-top:12px;line-height:1.4}
@@ -231,6 +234,8 @@ h2{font-size:76px;max-width:1200px}
 /* ---------- exemplo prático ---------- */
 .ex{display:grid;grid-template-columns:1fr 520px;gap:72px;width:100%;align-items:center;align-content:center}
 .ex .ph{aspect-ratio:4/3;width:100%}
+.ex .ph:has(img){aspect-ratio:auto}
+.ex .ph img{position:static;height:auto;object-fit:contain}
 .ex .pipe{grid-template-columns:repeat(5,1fr);gap:18px}
 .ex .node{min-height:0;padding:22px 20px 24px}
 .ex .node h3{margin-top:48px}
@@ -327,7 +332,7 @@ risk: escuro + accent único é um cluster comum; o coral em campo inteiro e o t
       <div class="visual">
         <figure class="ph" data-label="imagem · capa
 foto ou ilustração vertical
-coloque um &lt;img&gt; dentro deste figure"></figure>
+coloque um &lt;img&gt; dentro deste figure"><img src="images/capa.svg" alt="Blocos de código subindo para uma nuvem" onerror="this.remove()"></figure>
         <div class="term" aria-label="Terminal executando serverless deploy">
           <div class="bar"><i></i><i></i><i></i><span>zsh — minha-api</span></div>
           <pre id="term"></pre>
@@ -359,7 +364,7 @@ coloque um &lt;img&gt; dentro deste figure"></figure>
       </ul>
       <figure class="ph" data-label="imagem · conceito
 ilustração ou foto
-proporção livre"></figure>
+proporção livre"><img src="images/conceito.svg" alt="Tradicional vs. serverless: rack ligado 24/7 com gerenciamento manual versus funções na nuvem que executam só quando chega um evento" onerror="this.remove()"></figure>
     </div>
   </section>
 
@@ -369,7 +374,7 @@ proporção livre"></figure>
       <h2>Componentes e responsabilidades</h2>
       <p class="lede">Quem faz o quê dentro da arquitetura.</p>
     </div>
-    <div class="body two" style="grid-template-columns:1fr 520px">
+    <div class="body two" style="grid-template-columns:1fr 640px">
       <table class="tbl">
         <thead><tr><th>Componente</th><th>Responsabilidade</th></tr></thead>
         <tbody>
@@ -383,7 +388,7 @@ proporção livre"></figure>
       </table>
       <figure class="ph" data-label="imagem · diagrama
 arquitetura serverless
-(gateway → função → banco)"></figure>
+(gateway → função → banco)"><img src="images/diagrama.svg" alt="Usuário dispara evento → API/Gateway → Função → Banco de dados e Armazenamento, dentro do provedor de nuvem" onerror="this.remove()"></figure>
     </div>
   </section>
 
@@ -524,17 +529,17 @@ arquitetura serverless
     </div>
     <div class="body eco">
       <div class="tool f aws"><figure class="ph" data-label="logo
-lambda"></figure><div><div class="prov">AWS</div><h3>Lambda</h3><p>Executa a função em resposta a um evento. É o FaaS mais conhecido.</p></div></div>
+lambda"><img src="images/lambda.png" alt="" onerror="this.remove()"></figure><div><div class="prov">AWS</div><h3>Lambda</h3><p>Executa a função em resposta a um evento. É o FaaS mais conhecido.</p></div></div>
       <div class="tool f aws"><figure class="ph" data-label="logo
-api gateway"></figure><div><div class="prov">AWS</div><h3>API Gateway</h3><p>Porta de entrada HTTP: recebe, autentica e encaminha às funções.</p></div></div>
+api gateway"><img src="images/api_gateway.jpeg" alt="" onerror="this.remove()"></figure><div><div class="prov">AWS</div><h3>API Gateway</h3><p>Porta de entrada HTTP: recebe, autentica e encaminha às funções.</p></div></div>
       <div class="tool f aws"><figure class="ph" data-label="logo
-s3"></figure><div><div class="prov">AWS</div><h3>S3</h3><p>Armazena arquivos e dispara eventos quando recebe conteúdo novo.</p></div></div>
+s3"><img src="images/s3.jpeg" alt="" onerror="this.remove()"></figure><div><div class="prov">AWS</div><h3>S3</h3><p>Armazena arquivos e dispara eventos quando recebe conteúdo novo.</p></div></div>
       <div class="tool f"><figure class="ph" data-label="logo
-azure"></figure><div><div class="prov">Azure</div><h3>Azure Functions</h3><p>Equivalente da Microsoft para execução de funções por evento.</p></div></div>
+azure"><img src="images/azure_funcitions.png" alt="" onerror="this.remove()"></figure><div><div class="prov">Azure</div><h3>Azure Functions</h3><p>Equivalente da Microsoft para execução de funções por evento.</p></div></div>
       <div class="tool f"><figure class="ph" data-label="logo
-cloud functions"></figure><div><div class="prov">Google Cloud</div><h3>Cloud Functions</h3><p>Funções gerenciadas dentro do ecossistema do Google Cloud.</p></div></div>
+cloud functions"><img src="images/cloud_functions.png" alt="" onerror="this.remove()"></figure><div><div class="prov">Google Cloud</div><h3>Cloud Functions</h3><p>Funções gerenciadas dentro do ecossistema do Google Cloud.</p></div></div>
       <div class="tool f"><figure class="ph" data-label="logo
-cloud run"></figure><div><div class="prov">Google Cloud</div><h3>Cloud Run</h3><p>Contêineres sem servidor, para quando a função pura não basta.</p></div></div>
+cloud run"><img src="images/cloud_run.png" alt="" onerror="this.remove()"></figure><div><div class="prov">Google Cloud</div><h3>Cloud Run</h3><p>Contêineres sem servidor, para quando a função pura não basta.</p></div></div>
     </div>
   </section>
 
@@ -555,7 +560,7 @@ cloud run"></figure><div><div class="prov">Google Cloud</div><h3>Cloud Run</h3><
       </div>
       <figure class="ph" data-label="imagem · demonstração
 screenshot do console
-(bucket, função ou logs)"></figure>
+(bucket, função ou logs)"><img src="images/demo.svg" alt="Aplicativo envia foto.jpg ao S3; evento ObjectCreated dispara a Lambda, que grava a miniatura em outro bucket e o registro no DynamoDB" onerror="this.remove()"></figure>
     </div>
     <p class="foot f">Nenhum servidor ficou ligado esperando o upload. <strong>A função existiu apenas durante o processamento, e a cobrança corresponde a esse tempo.</strong></p>
   </section>
