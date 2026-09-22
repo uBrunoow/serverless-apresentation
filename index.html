@@ -90,9 +90,10 @@ h2{font-size:76px;max-width:1200px}
 .cover .meta i{width:24px;height:1px;background:var(--line-2)}
 .cover h1{font-size:196px;margin-top:64px;letter-spacing:-.03em;position:relative}
 .cover h1 span{display:block;font-size:44px;font-weight:400;letter-spacing:.02em;color:var(--muted);text-transform:none;margin-top:18px;line-height:1.15;max-width:640px}
-.cover .people{margin-top:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:40px;max-width:760px;padding-top:32px;border-top:1px solid var(--line)}
+.cover .people{margin-top:auto;display:grid;grid-template-columns:auto auto;justify-content:start;gap:64px;max-width:760px;padding-top:32px;border-top:1px solid var(--line)}
 .cover .people dt{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
 .cover .people dd{font-size:20px;color:var(--text);font-weight:400;line-height:1.35}
+.cover .people dd.names{display:grid;grid-template-columns:auto auto;column-gap:32px;justify-content:start}
 .cover .people dd.todo{color:var(--muted);font-weight:300}
 .cover .visual{position:relative;height:100%}
 .cover .visual .ph{position:absolute;top:-112px;right:0;bottom:-120px;left:40px;border-left:1px solid var(--line);border-top:0;border-right:0;border-bottom:0;background:linear-gradient(180deg,var(--bg-2),var(--bg))}
@@ -280,6 +281,24 @@ h2{font-size:76px;max-width:1200px}
   .slide,.slide.cur > .in,.f,.divider.cur,.pipe .track i,.pipe .pk,.grid1k i,.cold b::after{transition:none!important;animation:none!important}
   .term .cur{animation:none}
 }
+
+/* ---------- exportar PDF (tecla E): um slide por página ---------- */
+@page{size:1920px 1080px;margin:0}
+@media print{
+  html,body{height:auto;overflow:visible;background:var(--bg);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .stage{position:static;transform:none!important;width:var(--W);height:auto;overflow:visible}
+  .stage::before,.rail,.progress,.help{display:none}
+  .deck .grid{display:block!important;position:static;padding:0;overflow:visible}
+  .slide{position:relative;inset:auto;width:var(--W);height:var(--H);overflow:hidden;opacity:1;visibility:visible;transition:none;animation:none!important;break-after:page;
+    background-color:var(--bg);background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:96px 96px;background-position:72px 0}
+  .slide:last-child{break-after:auto}
+  .divider{background:var(--coral)}
+  .slide > .in{animation:none!important}
+  .slide *{transition:none!important}
+  .f{opacity:1!important;transform:none!important}
+  .term .line{opacity:1}
+  .term .cur{animation:none}
+}
 </style>
 </head>
 <body>
@@ -299,7 +318,7 @@ risk: escuro + accent único é um cluster comum; o coral em campo inteiro e o t
     <div class="num"><b id="railCur">01</b><br>—<br><span id="railTot">14</span></div>
   </aside>
   <div class="progress" aria-hidden="true"><i id="bar"></i></div>
-  <div class="help" aria-hidden="true"><span><kbd>←</kbd><kbd>→</kbd>navegar</span><span><kbd>O</kbd>visão geral</span><span><kbd>F</kbd>tela cheia</span></div>
+  <div class="help" aria-hidden="true"><span><kbd>←</kbd><kbd>→</kbd>navegar</span><span><kbd>O</kbd>visão geral</span><span><kbd>F</kbd>tela cheia</span><span><kbd>E</kbd>exportar PDF</span></div>
 
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-arrow" viewBox="0 0 72 24"><path d="M0 12h66M56 2l10 10-10 10" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
@@ -324,9 +343,8 @@ risk: escuro + accent único é um cluster comum; o coral em campo inteiro e o t
         <div class="meta"><span>Arquiteturas de Software</span><i></i><span>Participação III</span><i></i><span>21.09.2026</span></div>
         <h1>Server<br>less<span>Executar código na nuvem sem gerenciar diretamente os servidores.</span></h1>
         <dl class="people">
-          <div><dt>Integrantes</dt><dd class="todo">[Nome dos integrantes]</dd></div>
-          <div><dt>Disciplina</dt><dd class="todo">[Disciplina]</dd></div>
-          <div><dt>Professor</dt><dd class="todo">[Professor]</dd></div>
+          <div><dt>Integrantes</dt><dd class="names"><span>Bruno Werner</span><span>Pedro Urio</span><span>Vitor Rafael Marcelino</span><span>Ruan Carlos</span></dd></div>
+          <div><dt>Disciplina</dt><dd>Engenharia de Software</dd></div>
         </dl>
       </div>
       <div class="visual">
@@ -752,10 +770,24 @@ screenshot do console
     else if (k === 'Home') show(0);
     else if (k === 'End') show(slides.length - 1, { toEnd: true });
     else if (k === 'o' || k === 'O') overview();
+    else if (k === 'e' || k === 'E') print();
     else if (k === 'f' || k === 'F') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
   });
   // clique/toque no palco avança (fora do modo visão geral)
   stage.addEventListener('click', e => { if (!deck.classList.contains('overview') && !e.target.closest('a')) next(); });
+
+  /* ---- exportar PDF: tudo revelado na impressão, estado restaurado depois ---- */
+  addEventListener('beforeprint', () => {
+    overview(false);
+    termRun++;
+    if (termEl) termEl.innerHTML = script.map(l => `<div class="line show">${l[0] || '&nbsp;'}</div>`).join('');
+    slides.forEach(s => { frags(s).forEach(f => { f.classList.add('on'); f.classList.remove('was'); }); s.querySelectorAll('.pipe').forEach(movePacket); });
+    if (bigN) { bigN.firstChild.textContent = 1000; bigN.querySelector('small').textContent = 'execuções em paralelo'; }
+  });
+  addEventListener('afterprint', () => {
+    slides.forEach(s => frags(s).forEach(f => f.classList.remove('on', 'was')));
+    const c = cur; slides[c].classList.remove('cur'); cur = -1; show(c);
+  });
 
   window.deck = { show, next, prev, count: slides.length };
   const start = parseInt(location.hash.slice(1), 10);
