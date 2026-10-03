@@ -243,6 +243,29 @@ h2{font-size:76px;max-width:1200px}
 .ex .node h3{font-size:22px}
 .ex .node p{font-size:17px}
 
+/* ---------- exemplos: diagrama + código ---------- */
+.ex2{flex-direction:column;gap:28px;width:100%}
+.ex2 .pipe{gap:18px}
+.ex2 .node{min-height:0;padding:22px 20px 24px}
+.ex2 .node h3{margin-top:48px;font-size:22px}
+.ex2 .node p{font-size:17px}
+.diag{width:100%;height:auto;display:block}
+.diag .bx{fill:var(--bg-2);stroke:var(--line-2);stroke-width:1.5}
+.diag .bx.fn{fill:var(--surface);stroke:var(--coral)}
+.diag .ln{stroke:var(--dim);stroke-width:2;fill:none}
+.diag .kk{font-family:var(--mono);font-size:12px;letter-spacing:.14em;fill:var(--dim)}
+.diag .fnk{fill:var(--coral)}
+.diag .tt{font-family:var(--font);font-size:22px;font-weight:600;fill:var(--text)}
+.codes{display:grid;grid-template-columns:1fr 1fr;gap:32px;width:100%}
+.codes.c2{grid-template-columns:3fr 2fr}
+.code{background:#07090D;border:1px solid var(--line-2);font-family:var(--mono);font-size:14px;line-height:1.5;min-width:0}
+.code .cb{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.code .cb i{width:10px;height:10px;background:var(--coral)}
+.code .cb span{margin-left:auto}
+.code pre{padding:16px 20px 18px;font:inherit;color:var(--muted);white-space:pre;overflow:hidden}
+.code .kw{color:var(--coral);font-style:normal}
+.code .cm{color:var(--dim)}
+
 /* ---------- conclusão ---------- */
 .concl{display:grid;grid-template-columns:1fr 1fr;gap:96px;width:100%;align-items:start}
 .concl .thesis{font-size:44px;font-weight:500;line-height:1.15;letter-spacing:-.01em;text-wrap:pretty}
@@ -255,7 +278,7 @@ h2{font-size:76px;max-width:1200px}
 
 /* ---------- referências ---------- */
 .refs{list-style:none;columns:2;column-gap:96px;width:100%}
-.refs li{break-inside:avoid;padding:22px 0;border-bottom:1px solid var(--line);font-size:23px;line-height:1.35}
+.refs li{break-inside:avoid;padding:16px 0;border-bottom:1px solid var(--line);font-size:23px;line-height:1.35}
 .refs li b{font-weight:600;text-transform:uppercase;display:block;font-size:20px;margin-bottom:4px}
 .refs li span{color:var(--muted);font-weight:300}
 .refs li code{font-family:var(--mono);font-size:16px;color:var(--coral);display:block;margin-top:6px}
@@ -331,6 +354,7 @@ risk: escuro + accent único é um cluster comum; o coral em campo inteiro e o t
     <symbol id="i-out" viewBox="0 0 24 24"><path d="M4 12h14M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 4v16" stroke="currentColor" stroke-width="1.8"/></symbol>
     <symbol id="i-img" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 17l5-5 4 4 3-3 6 6" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="7" width="3" height="3" fill="currentColor"/></symbol>
     <symbol id="i-bucket" viewBox="0 0 24 24"><path d="M4 4h16l-2 17H6z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 9h16" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l4 2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
     <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L5 14h6l-1 8 9-13h-6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
   </svg>
 
@@ -519,21 +543,21 @@ arquitetura serverless
       <div class="col pro">
         <h3>Indicado para</h3>
         <ul>
-          <li class="f"><svg><use href="#i-check"/></svg><span>APIs e backends de aplicações web</span></li>
-          <li class="f"><svg><use href="#i-check"/></svg><span>Backends de aplicações mobile</span></li>
+          <li class="f"><svg><use href="#i-check"/></svg><span>APIs e backends de aplicações web e mobile</span></li>
           <li class="f"><svg><use href="#i-check"/></svg><span>Processamento de arquivos e imagens</span></li>
-          <li class="f"><svg><use href="#i-check"/></svg><span>Automação de tarefas e rotinas agendadas</span></li>
+          <li class="f"><svg><use href="#i-check"/></svg><span>Tarefas agendadas e automações</span></li>
           <li class="f"><svg><use href="#i-check"/></svg><span>Sistemas orientados a eventos</span></li>
+          <li class="f"><svg><use href="#i-check"/></svg><span>Demanda imprevisível, com picos e longos períodos ociosos</span></li>
         </ul>
       </div>
       <div class="col con">
         <h3>Avalie outras opções quando</h3>
         <ul>
           <li class="f"><svg><use href="#i-x"/></svg><span>A aplicação precisa de execução contínua</span></li>
-          <li class="f"><svg><use href="#i-x"/></svg><span>É preciso controle fino da infraestrutura</span></li>
+          <li class="f"><svg><use href="#i-x"/></svg><span>A latência precisa ser baixa e previsível</span></li>
           <li class="f"><svg><use href="#i-x"/></svg><span>O processamento é longo demais para os limites</span></li>
-          <li class="f"><svg><use href="#i-x"/></svg><span>A dependência de um provedor é um risco relevante</span></li>
-          <li class="f"><svg><use href="#i-x"/></svg><span>O volume constante torna o custo por execução alto</span></li>
+          <li class="f"><svg><use href="#i-x"/></svg><span>A carga é alta e constante: o custo pode superar o de um servidor dedicado</span></li>
+          <li class="f"><svg><use href="#i-x"/></svg><span>Controle fino da infraestrutura ou independência de provedor são requisitos</span></li>
         </ul>
       </div>
     </div>
@@ -561,26 +585,114 @@ cloud run"><img src="images/cloud_run.png" alt="" onerror="this.remove()"></figu
     </div>
   </section>
 
-  <!-- 13 · EXEMPLO PRÁTICO -->
+  <!-- 13a · EXEMPLO PRÁTICO · EVENTO -->
   <section class="slide" data-section="03 · Quando usar">
     <div class="in head">
-      <h2>Exemplo prático: upload de imagem</h2>
-      <p class="lede">O mesmo fluxo da arquitetura, agora com serviços reais.</p>
+      <div class="kicker">Exemplo prático</div>
+      <h2>Gatilho por evento</h2>
     </div>
-    <div class="body ex">
-      <div class="pipe">
-        <div class="track"><i></i></div><div class="pk"></div>
-        <div class="node f"><span class="i">01</span><svg class="ic"><use href="#i-img"/></svg><h3>Upload</h3><p>O usuário envia a foto pelo aplicativo.</p></div>
-        <div class="node f"><span class="i">02</span><svg class="ic"><use href="#i-bucket"/></svg><h3>Amazon S3</h3><p>O arquivo chega ao bucket.</p></div>
-        <div class="node f"><span class="i">03</span><svg class="ic"><use href="#i-bolt"/></svg><h3>Evento</h3><p>O storage avisa que há arquivo novo.</p></div>
-        <div class="node f"><span class="i">04</span><svg class="ic"><use href="#i-fn"/></svg><h3>Lambda</h3><p>Redimensiona e gera a miniatura.</p></div>
-        <div class="node f"><span class="i">05</span><svg class="ic"><use href="#i-db"/></svg><h3>Resultado</h3><p>Miniatura no S3 e registro no banco.</p></div>
+    <div class="body ex2">
+      <div class="f">
+        <svg class="diag" viewBox="0 0 1616 200" role="img" aria-label="Upload no S3 e novo cadastro disparam a Lambda, que gera a miniatura no S3 com registro no banco e envia o e-mail de confirmação pelo SES">
+          <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#5E6879"/></marker></defs>
+          <rect class="bx" x="0" y="0" width="400" height="84"/>
+          <text class="kk" x="24" y="28">GATILHO · EVENTO DE STORAGE</text>
+          <text class="tt" x="24" y="62">UPLOAD NO S3</text>
+          <rect class="bx" x="0" y="116" width="400" height="84"/>
+          <text class="kk" x="24" y="144">GATILHO · EVENTO DA APLICAÇÃO</text>
+          <text class="tt" x="24" y="178">NOVO CADASTRO</text>
+          <rect class="bx fn" x="620" y="45" width="376" height="110"/>
+          <text class="kk fnk" x="644" y="88">REAGE AO EVENTO</text>
+          <text class="tt" x="644" y="124">AWS LAMBDA</text>
+          <rect class="bx" x="1216" y="0" width="400" height="84"/>
+          <text class="kk" x="1240" y="26">RESULTADO</text>
+          <text class="tt" x="1240" y="52">MINIATURA NO S3</text>
+          <text class="tt" x="1240" y="76">+ REGISTRO NO BANCO</text>
+          <rect class="bx" x="1216" y="116" width="400" height="84"/>
+          <text class="kk" x="1240" y="142">RESULTADO</text>
+          <text class="tt" x="1240" y="168">E-MAIL DE CONFIRMAÇÃO</text>
+          <text class="tt" x="1240" y="192">(AMAZON SES)</text>
+          <path class="ln" d="M400 42L612 88" marker-end="url(#ah)"/>
+          <path class="ln" d="M400 158L612 112" marker-end="url(#ah)"/>
+          <path class="ln" d="M996 88L1208 42" marker-end="url(#ah)"/>
+          <path class="ln" d="M996 112L1208 158" marker-end="url(#ah)"/>
+        </svg>
       </div>
-      <figure class="ph" data-label="imagem · demonstração
-screenshot do console
-(bucket, função ou logs)"><img src="images/demo.svg" alt="Aplicativo envia foto.jpg ao S3; evento ObjectCreated dispara a Lambda, que grava a miniatura em outro bucket e o registro no DynamoDB" onerror="this.remove()"></figure>
+      <div class="codes">
+        <div class="code f">
+          <div class="cb"><i></i>Upload de imagem<span>Python · Lambda</span></div>
+<pre><i class="kw">def</i> handler(event, context):
+    info = event["Records"][0]["s3"]
+    bucket, key = info["bucket"]["name"], info["object"]["key"]
+
+    obj = s3.get_object(Bucket=bucket, Key=key)
+    img = Image.open(io.BytesIO(obj["Body"].read()))
+    img.thumbnail((200, 200))
+
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG")
+    <span class="cm"># outro bucket: evita disparar um novo evento</span>
+    s3.put_object(Bucket="miniaturas", Key=key, Body=buf.getvalue())
+    tabela.put_item(Item={"arquivo": key})</pre>
+        </div>
+        <div class="code f">
+          <div class="cb"><i></i>E-mail de confirmação<span>Python · Lambda</span></div>
+<pre><i class="kw">def</i> handler(event, context):
+    <i class="kw">for</i> r <i class="kw">in</i> event["Records"]:
+        <i class="kw">if</i> r["eventName"] != "INSERT":
+            <i class="kw">continue</i>
+        email = r["dynamodb"]["NewImage"]["email"]["S"]
+        ses.send_email(
+            Source="no-reply@exemplo.com",
+            Destination={"ToAddresses": [email]},
+            Message={
+                "Subject": {"Data": "Confirme seu cadastro"},
+                "Body": {"Text": {"Data": "Bem-vindo!"}},
+            },
+        )</pre>
+        </div>
+      </div>
     </div>
-    <p class="foot f">Nenhum servidor ficou ligado esperando o upload. <strong>A função existiu apenas durante o processamento, e a cobrança corresponde a esse tempo.</strong></p>
+    <p class="foot f">Nenhum servidor ficou ligado esperando. <strong>A função existe apenas durante o processamento, e a cobrança corresponde a esse tempo.</strong></p>
+  </section>
+
+  <!-- 13b · EXEMPLO PRÁTICO · CRON -->
+  <section class="slide" data-section="03 · Quando usar">
+    <div class="in head">
+      <div class="kicker">Exemplo prático</div>
+      <h2>Gatilho agendado (cron)</h2>
+    </div>
+    <div class="body ex2">
+      <div class="pipe" style="grid-template-columns:repeat(3,1fr)">
+        <div class="track"><i></i></div><div class="pk"></div>
+        <div class="node f"><span class="i">01</span><svg class="ic"><use href="#i-clock"/></svg><h3>Agendamento</h3><p>Todo dia às 8h, uma regra do Amazon EventBridge dispara a função.</p></div>
+        <div class="node f"><span class="i">02</span><svg class="ic"><use href="#i-fn"/></svg><h3>Lambda</h3><p>Consulta as vendas do dia anterior e monta o relatório.</p></div>
+        <div class="node f"><span class="i">03</span><svg class="ic"><use href="#i-bucket"/></svg><h3>Amazon S3</h3><p>Guarda o relatório do dia.</p></div>
+      </div>
+      <div class="codes c2 f">
+        <div class="code">
+          <div class="cb"><i></i>Relatório diário<span>Python · Lambda</span></div>
+<pre><i class="kw">def</i> handler(event, context):
+    ontem = date.today() - timedelta(days=1)
+    vendas = consulta_vendas(ontem)  <span class="cm"># consulta ao banco</span>
+    relatorio = {"data": str(ontem),
+                 "total": sum(v["valor"] for v in vendas)}
+    s3.put_object(
+        Bucket="relatorios",
+        Key=f"vendas/{ontem}.json",
+        Body=json.dumps(relatorio),
+    )</pre>
+        </div>
+        <div class="code">
+          <div class="cb"><i></i>Regra de agendamento<span>EventBridge</span></div>
+<pre>cron(0 11 * * ? *)
+
+<span class="cm"># minutos horas dia mês dia-da-semana ano
+# todo dia às 11h UTC = 8h em Brasília</span></pre>
+        </div>
+      </div>
+    </div>
+    <p class="foot f">O código roda só nos minutos em que o trabalho acontece. <strong>Um servidor tradicional ficaria ligado 24 horas para trabalhar alguns minutos por dia.</strong></p>
   </section>
 
   <!-- 14 · CONCLUSÃO -->
@@ -606,6 +718,9 @@ screenshot do console
     <div class="body" style="display:block">
       <ul class="refs">
         <li><b>AWS</b><span>Computação sem servidor.</span><code>aws.amazon.com/serverless</code></li>
+        <li><b>AWS</b><span>Understanding the Lambda execution environment lifecycle.</span><code>docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html</code></li>
+        <li><b>AWS</b><span>Amazon Web Services Announces AWS Lambda (2014).</span><code>press.aboutamazon.com/2014/11/amazon-web-services-announces-aws-lambda</code></li>
+        <li><b>Google</b><span>Google App Engine at Campfire One (2008).</span><code>developers.googleblog.com/2008/04/google-app-engine-at-campfire-one.html</code></li>
         <li><b>IBM</b><span>What is serverless?</span><code>ibm.com/topics/serverless</code></li>
         <li><b>Databricks</b><span>What is Serverless Computing?</span><code>databricks.com/glossary/serverless-computing</code></li>
         <li><b>Red Hat</b><span>O que é serverless?</span><code>redhat.com/pt-br/topics/cloud-native-apps/what-is-serverless</code></li>
